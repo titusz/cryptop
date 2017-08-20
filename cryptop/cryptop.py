@@ -24,10 +24,14 @@ CONFFILE = os.path.join(BASEDIR, 'config.ini')
 CONFIG = configparser.ConfigParser()
 COIN_FORMAT = re.compile('[A-Z]{2,5},\d{0,}\.?\d{0,}')
 
-SORT_FNS = { 'coin' : lambda item: item[0],
-             'price': lambda item: float(item[1][0]),
-             'held' : lambda item: float(item[2]),
-             'val'  : lambda item: float(item[1][0]) * float(item[2]) }
+SORT_FNS = {
+    'coin' : lambda item: item[0],
+    'price': lambda item: float(item[1][0]),
+    'held' : lambda item: float(item[2]),
+    'val'  : lambda item: float(item[1][0]) * float(item[2]),
+    'pct'  : lambda item: float(item[1][3]),
+}
+
 SORTS = list(SORT_FNS.keys())
 COLUMN = SORTS.index('val')
 ORDER = True
@@ -76,10 +80,15 @@ def get_price(coin, curr=None):
 
     try:
         data_raw = r.json()['RAW']
-        return [(data_raw[c][curr]['PRICE'],
+        return [
+            (
+                data_raw[c][curr]['PRICE'],
                 data_raw[c][curr]['HIGH24HOUR'],
-                data_raw[c][curr]['LOW24HOUR']) for c in coin.split(',')]
-    except:
+                data_raw[c][curr]['LOW24HOUR'],
+                data_raw[c][curr]['CHANGEPCT24HOUR'],
+            )
+            for c in coin.split(',')]
+    except Exception:
         sys.exit('Could not parse data')
 
 
@@ -116,12 +125,13 @@ def str_formatter(coin, val, held):
     avg_length = CONFIG['theme'].getint('dec_places', 2) + 10
     held_str = '{:>{},.8f}'.format(float(held), max_length)
     val_str = '{:>{},.{}f}'.format(float(held) * val[0], max_length, dec_place)
-    return '  {:<5} {:>{}}  {} {:>{}} {:>{}} {:>{}}'.format(coin,
+    return '  {:<5} {:>{}}  {} {:>{}} {:>{}} {:>{}} {:7.2f} %'.format(coin,
         locale.currency(val[0], grouping=True)[:max_length], avg_length,
         held_str[:max_length],
         locale.currency(float(held) * val[0], grouping=True)[:max_length], avg_length,
         locale.currency(val[1], grouping=True)[:max_length], avg_length,
-        locale.currency(val[2], grouping=True)[:max_length], avg_length)
+        locale.currency(val[2], grouping=True)[:max_length], avg_length,
+        val[3])
 
 
 def bitfinex():
@@ -258,7 +268,9 @@ def write_scr(stdscr, wallet, y, x):
     if y >= 1:
         stdscr.addnstr(0, 0, 'cryptop v0.1.9', x, curses.color_pair(2))
     if y >= 2:
-        header = '  COIN{}PRICE{}HELD {}VAL{}HIGH {}LOW  '.format(first_pad, second_pad, third_pad, first_pad, first_pad)
+        header = '  COIN{}PRICE{}HELD {}VAL{}HIGH {}LOW    CHANGE  '.format(
+            first_pad, second_pad, third_pad, first_pad, first_pad
+        )
         stdscr.addnstr(1, 0, header, x, curses.color_pair(3))
 
     total = 0
