@@ -269,7 +269,55 @@ def poloniex():
     return currency_balances
 
 
+def cryptoid(coin, address):
+    '''Get balance of address from cryptoid.info'''
+    tpl = 'http://chainz.cryptoid.info/{coin}/api.dws?q=getbalance&a={address}'
+    url = tpl.format(coin=coin.lower(), address=address)
+    try:
+        resp = requests.get(url, timeout=5)
+        result = float(resp.text)
+    except Exception:
+        result = None
+    return result
+
+
 def update_full_portfolio(wallet):
+    global FULL_PORTFOLIO
+    total_balances = update_exchanges(wallet)
+    total_balances = update_addresses(total_balances)
+    FULL_PORTFOLIO = total_balances
+    return total_balances
+
+
+def update_addresses(wallet):
+    '''Create a new wallet with balances added from custom addresses'''
+    global FULL_PORTFOLIO
+
+    coin_func = {
+        'dash': cryptoid,
+        'ltc': cryptoid,
+        'strat': cryptoid,
+        'crea': cryptoid,
+    }
+
+    # copy of wallet with float values
+    total_balances = {cb[0]:  float(cb[1]) for cb in wallet.items()}
+
+    if 'addresses' in CONFIG:
+        for coin, address in CONFIG['addresses'].items():
+            amount = coin_func[coin](coin, address)
+            if total_balances.get(coin.upper()):
+                total_balances[coin.upper()] += amount
+            else:
+                total_balances[coin.upper()] = amount
+
+    # convert back to string values
+    total_balances = {cb[0]: str(cb[1]) for cb in total_balances.items()}
+    FULL_PORTFOLIO = total_balances
+    return total_balances
+
+
+def update_exchanges(wallet):
     '''Create a new wallet with balances added from exchanges'''
 
     global FULL_PORTFOLIO
@@ -285,7 +333,7 @@ def update_full_portfolio(wallet):
     # copy of wallet with float values
     total_balances = {cb[0]:  float(cb[1]) for cb in wallet.items()}
 
-    # add vallues from exchange balances
+    # add values from exchange balances
     for balances_getter in apis:
         balances = balances_getter()
         for currency, amount in balances.items():
@@ -297,6 +345,7 @@ def update_full_portfolio(wallet):
     # convert back to string values
     total_balances = {cb[0]: str(cb[1]) for cb in total_balances.items()}
     FULL_PORTFOLIO = total_balances
+    return total_balances
 
 
 def write_scr(stdscr, wallet, y, x):
