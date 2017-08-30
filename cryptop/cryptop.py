@@ -281,6 +281,17 @@ def cryptoid(coin, address):
     return result
 
 
+def zec(coin, address):
+    '''Get ZEC balance from zcha.in api'''
+    tpl = "https://api.zcha.in/v2/mainnet/accounts/{}"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5).json()
+        return float(resp['balance'])
+    except Exception:
+        pass
+
+
 def update_full_portfolio(wallet):
     global FULL_PORTFOLIO
     total_balances = update_exchanges(wallet)
@@ -298,6 +309,7 @@ def update_addresses(wallet):
         'ltc': cryptoid,
         'strat': cryptoid,
         'crea': cryptoid,
+        'zec': zec,
     }
 
     # copy of wallet with float values
@@ -306,10 +318,11 @@ def update_addresses(wallet):
     if 'addresses' in CONFIG:
         for coin, address in CONFIG['addresses'].items():
             amount = coin_func[coin](coin, address)
-            if total_balances.get(coin.upper()):
-                total_balances[coin.upper()] += amount
-            else:
-                total_balances[coin.upper()] = amount
+            if amount:
+                if total_balances.get(coin.upper()):
+                    total_balances[coin.upper()] += amount
+                else:
+                    total_balances[coin.upper()] = amount
 
     # convert back to string values
     total_balances = {cb[0]: str(cb[1]) for cb in total_balances.items()}
