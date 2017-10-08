@@ -154,6 +154,7 @@ def bitfinex():
         for entry in resp.json():
 
             currency = entry['currency'].upper()
+            currency = 'DASH' if currency == 'DSH' else currency
             amount = float(entry['amount'])
 
             if amount != 0 and if_coin(currency):
