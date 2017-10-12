@@ -83,9 +83,9 @@ def get_price(coin, curr=None):
         return [
             (
                 data_raw[c][curr]['PRICE'],
-                data_raw[c][curr]['HIGH24HOUR'],
-                data_raw[c][curr]['LOW24HOUR'],
-                data_raw[c][curr]['CHANGEPCT24HOUR'],
+                data_raw[c][curr]['HIGH24HOUR'] or 0.001,
+                data_raw[c][curr]['LOW24HOUR'] or 0.001,
+                data_raw[c][curr]['CHANGEPCT24HOUR'] or 0.001,
             )
             for c in coin.split(',')]
     except Exception:
