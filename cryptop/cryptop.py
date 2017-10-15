@@ -394,8 +394,14 @@ def write_scr(stdscr, wallet, y, x):
                 total += float(held) * val[0]
 
     if y > len(coinl) + 3:
-        stdscr.addnstr(y - 2, 0, 'Total Holdings: {:10}    '
-            .format(locale.currency(total, grouping=True)), x, curses.color_pair(3))
+        btc_price = get_price('BTC')[0][0]
+        btc_total = total / btc_price
+        stdscr.addnstr(
+            y - 2, 0,
+            'Total Holdings: {:10} / BTC {:.4f}  '.format(locale.currency(total, grouping=True), btc_total),
+            x,
+            curses.color_pair(3)
+        )
         stdscr.addnstr(y - 1, 0,
             '[A] Add/update coin [R] Remove coin [S] Sort [C] Cycle sort [0\Q]Exit', x,
             curses.color_pair(2))
