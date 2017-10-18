@@ -282,13 +282,23 @@ def cryptoid(coin, address):
     return result
 
 
-def zec(coin, address):
+def zchain(coin, address):
     '''Get ZEC balance from zcha.in api'''
     tpl = "https://api.zcha.in/v2/mainnet/accounts/{}"
     url = tpl.format(address)
     try:
         resp = requests.get(url, timeout=5).json()
         return float(resp['balance'])
+    except Exception:
+        pass
+
+
+def zcashnetwork(coin, address):
+    tpl = "https://zcashnetwork.info/api/addr/{}/balance"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5).json()
+        return float(resp) / 100000000
     except Exception:
         pass
 
@@ -330,7 +340,7 @@ def update_addresses(wallet):
         'ltc': cryptoid,
         'strat': cryptoid,
         'crea': cryptoid,
-        'zec': zec,
+        'zec': zcashnetwork,
         'eth': etherscan,
         'etc': etcchain,
     }
