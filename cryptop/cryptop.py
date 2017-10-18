@@ -303,6 +303,16 @@ def etherscan(coin, address):
         pass
 
 
+def etcchain(coin, address):
+    tpl = "https://etcchain.com/api/v1/getAddressBalance?address={}"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5).json()
+        return float(resp['balance'])
+    except Exception:
+        pass
+
+
 def update_full_portfolio(wallet):
     global FULL_PORTFOLIO
     total_balances = update_exchanges(wallet)
@@ -322,6 +332,7 @@ def update_addresses(wallet):
         'crea': cryptoid,
         'zec': zec,
         'eth': etherscan,
+        'etc': etcchain,
     }
 
     # copy of wallet with float values
