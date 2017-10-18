@@ -293,6 +293,16 @@ def zec(coin, address):
         pass
 
 
+def etherscan(coin, address):
+    tpl = "https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5).json()
+        return float(resp['result']) / 1000000000000000000
+    except Exception:
+        pass
+
+
 def update_full_portfolio(wallet):
     global FULL_PORTFOLIO
     total_balances = update_exchanges(wallet)
@@ -311,6 +321,7 @@ def update_addresses(wallet):
         'strat': cryptoid,
         'crea': cryptoid,
         'zec': zec,
+        'eth': etherscan,
     }
 
     # copy of wallet with float values
