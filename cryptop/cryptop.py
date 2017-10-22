@@ -323,12 +323,12 @@ def etcchain(coin, address):
         pass
 
 
-def blockchain_info(coin, address):
-    tpl = "https://blockchain.info/de/balance?active={}"
+def blockcypher(coin, address):
+    tpl = "https://api.blockcypher.com/v1/btc/main/addrs/{}/balance"
     url = tpl.format(address)
     try:
         resp = requests.get(url, timeout=5).json()
-        return float(resp['final_balance'])
+        return float(resp['final_balance']) / 100000000
     except Exception:
         pass
 
@@ -346,7 +346,7 @@ def update_addresses(wallet):
     global FULL_PORTFOLIO
 
     coin_func = {
-        'btc': blockchain_info,
+        'btc': blockcypher,
         'crea': cryptoid,
         'dash': cryptoid,
         'etc': etcchain,
