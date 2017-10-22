@@ -323,6 +323,16 @@ def etcchain(coin, address):
         pass
 
 
+def blockchain_info(coin, address):
+    tpl = "https://blockchain.info/de/balance?active={}"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5).json()
+        return float(resp['final_balance'])
+    except Exception:
+        pass
+
+
 def update_full_portfolio(wallet):
     global FULL_PORTFOLIO
     total_balances = update_exchanges(wallet)
@@ -336,13 +346,14 @@ def update_addresses(wallet):
     global FULL_PORTFOLIO
 
     coin_func = {
+        'btc': blockchain_info,
+        'crea': cryptoid,
         'dash': cryptoid,
+        'etc': etcchain,
+        'eth': etherscan,
         'ltc': cryptoid,
         'strat': cryptoid,
-        'crea': cryptoid,
         'zec': zcashnetwork,
-        'eth': etherscan,
-        'etc': etcchain,
     }
 
     # copy of wallet with float values
