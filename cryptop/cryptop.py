@@ -333,6 +333,16 @@ def blockcypher(coin, address):
         pass
 
 
+def btgexp(coin, address):
+    tpl = 'http://btgexp.com/ext/getbalance/{}'
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5)
+        return float(resp.text)
+    except Exception:
+        pass
+
+
 def update_full_portfolio(wallet):
     global FULL_PORTFOLIO
     total_balances = update_exchanges(wallet)
@@ -347,6 +357,7 @@ def update_addresses(wallet):
 
     coin_func = {
         'btc': blockcypher,
+        'btg': btgexp,
         'crea': cryptoid,
         'dash': cryptoid,
         'etc': etcchain,
