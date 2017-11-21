@@ -521,7 +521,7 @@ def mainc(stdscr):
     while inp not in {KEY_ZERO, KEY_ESCAPE, KEY_Q, KEY_q}:
         stdscr.clear()
 
-        if c % 100 == 0:
+        if c % 500 == 0:
             t = threading.Thread(target=update_full_portfolio, args=(wallet,))
             t.start()
         c += 1
