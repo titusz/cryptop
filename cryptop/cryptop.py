@@ -323,6 +323,16 @@ def etcchain(coin, address):
         pass
 
 
+def gastracker(coin, address):
+    tpl = "http://gastracker.io/addr/{}"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, headers={'Accept': 'application/json'}, timeout=5).json()
+        return resp['balance']['amount'] / 1000000000000000000
+    except Exception:
+        pass
+
+
 def blockcypher(coin, address):
     tpl = "https://api.blockcypher.com/v1/btc/main/addrs/{}/balance"
     url = tpl.format(address)
@@ -360,7 +370,7 @@ def update_addresses(wallet):
         'btg': btgexp,
         'crea': cryptoid,
         'dash': cryptoid,
-        'etc': etcchain,
+        'etc': gastracker,
         'eth': etherscan,
         'ltc': cryptoid,
         'strat': cryptoid,
