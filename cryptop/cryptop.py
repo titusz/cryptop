@@ -307,7 +307,7 @@ def etherscan(coin, address):
     tpl = "https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest"
     url = tpl.format(address)
     try:
-        resp = requests.get(url, timeout=5).json()
+        resp = requests.get(url, timeout=10).json()
         return float(resp['result']) / 1000000000000000000
     except Exception:
         pass
@@ -370,6 +370,7 @@ def update_addresses(wallet):
         'btg': btgexp,
         'crea': cryptoid,
         'dash': cryptoid,
+        'dgb': cryptoid,
         'etc': gastracker,
         'eth': etherscan,
         'ltc': cryptoid,
