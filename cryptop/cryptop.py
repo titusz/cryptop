@@ -124,6 +124,7 @@ def str_formatter(coin, val, held):
     dec_place = CONFIG['theme'].getint('dec_places', 2)
     avg_length = CONFIG['theme'].getint('dec_places', 2) + 10
     held_str = '{:>{},.8f}'.format(float(held), max_length)
+    val = tuple([float(v) for v in val])
     val_str = '{:>{},.{}f}'.format(float(held) * val[0], max_length, dec_place)
     return '  {:<5} {:>{}}  {} {:>{}} {:>{}} {:>{}} {:7.2f} %'.format(coin,
         locale.currency(val[0], grouping=True)[:max_length], avg_length,
@@ -453,6 +454,7 @@ def write_scr(stdscr, wallet, y, x):
             coinvl = list(x[1] for x in s)
             heldl = list(x[2] for x in s)
             for coin, val, held in zip(coinl, coinvl, heldl):
+                val = tuple(float(v) for v in val)
                 if coinl.index(coin) + 2 < y:
                     stdscr.addnstr(coinl.index(coin) + 2, 0,
                     str_formatter(coin, val, held), x, curses.color_pair(2))
