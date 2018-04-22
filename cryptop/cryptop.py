@@ -304,6 +304,16 @@ def zcashnetwork(coin, address):
         pass
 
 
+def decred(coin, address):
+    tpl = "https://mainnet.decred.org/api/addr/{}/balance"
+    url = tpl.format(address)
+    try:
+        resp = requests.get(url, timeout=5).json()
+        return float(resp) / 100000000
+    except Exception:
+        pass
+
+
 def etherscan(coin, address):
     tpl = "https://api.etherscan.io/api?module=account&action=balance&address={}&tag=latest"
     url = tpl.format(address)
@@ -371,6 +381,7 @@ def update_addresses(wallet):
         'btg': btgexp,
         'crea': cryptoid,
         'dash': cryptoid,
+        'dcr': decred,
         'dgb': cryptoid,
         'etc': gastracker,
         'eth': etherscan,
