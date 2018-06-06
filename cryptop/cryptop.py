@@ -14,6 +14,7 @@ import hashlib
 import threading
 from urllib.parse import urlencode, quote_plus
 
+import ccxt
 import requests
 import requests_cache
 
@@ -133,6 +134,37 @@ def str_formatter(coin, val, held):
         locale.currency(val[1], grouping=True)[:max_length], avg_length,
         locale.currency(val[2], grouping=True)[:max_length], avg_length,
         val[3])
+
+
+def ccxt_balance(exchange):
+    '''Fetch balance from any ccxt supported exchange.'''
+    key, secret = CONFIG[exchange].get('key'), CONFIG[exchange].get('secret')
+    api = getattr(ccxt, exchange)({'apiKey': key, 'secret': secret})
+    currency_balances = {}
+    try:
+        resp = api.fetch_balance()
+        for currency, amount in resp['total'].items():
+            currency = currency.upper()
+            amount = float(amount)
+            if amount != 0 and if_coin(currency):
+                currency_balances[currency] = amount
+    except Exception:
+        pass
+    return currency_balances
+
+
+def kraken():
+    '''Collect balances from kraken exchange'''
+    return ccxt_balance('kraken')
+
+
+def binance():
+    '''Collect balances from binance exchange'''
+    return ccxt_balance('binance')
+
+def hitbtc():
+    '''Collect balances from binance exchange'''
+    return ccxt_balance('hitbtc')
 
 
 def bitfinex():
@@ -413,7 +445,15 @@ def update_exchanges(wallet):
 
     global FULL_PORTFOLIO
 
-    exchanges = ('bitfinex', 'bittrex', 'cryptopia', 'poloniex')
+    exchanges = (
+        'binance',
+        'bitfinex',
+        'bittrex',
+        'cryptopia',
+        'kraken',
+        'poloniex',
+        'hitbtc',
+    )
     apis = []
 
     for exchange in exchanges:
