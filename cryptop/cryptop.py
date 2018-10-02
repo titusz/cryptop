@@ -89,7 +89,8 @@ def get_price(coin, curr=None):
                 data_raw[c][curr]['CHANGEPCT24HOUR'] or 0.001,
             )
             for c in coin.split(',')]
-    except Exception:
+    except Exception as e:
+        print(repr(e))
         sys.exit('Could not parse data')
 
 
