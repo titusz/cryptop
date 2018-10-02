@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     packages=find_packages(),
-    install_requires=['requests', 'requests_cache', 'ccxt'],
+    install_requires=['requests', 'requests_cache', 'ccxt==1.14.141'],
     package_data={'cryptop': ['config.ini']},
     entry_points = {
         'console_scripts': ['cryptop = cryptop.cryptop:main'],
